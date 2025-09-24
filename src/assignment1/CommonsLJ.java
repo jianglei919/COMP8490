@@ -21,6 +21,7 @@ public class CommonsLJ extends JPanel {
 	public final static Color3f Red = new Color3f(1.0f, 0.0f, 0.0f);
 	public final static Color3f Green = new Color3f(0.0f, 1.0f, 0.0f);
 	public final static Color3f Blue = new Color3f(0.0f, 0.0f, 1.0f);
+	public final static Color3f SkyBlue = new Color3f(0.53f, 0.81f, 0.92f);
 	public final static Color3f Yellow = new Color3f(1.0f, 1.0f, 0.0f);
 	public final static Color3f Cyan = new Color3f(0.0f, 1.0f, 1.0f);
 	public final static Color3f Orange = new Color3f(1.0f, 0.5f, 0.0f);
