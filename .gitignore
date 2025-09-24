@@ -1,0 +1,54 @@
+########################
+# Java
+########################
+*.class
+*.log
+*.jar
+*.war
+*.ear
+
+########################
+# Eclipse
+########################
+.project
+.classpath
+.settings/
+bin/
+
+########################
+# IntelliJ IDEA
+########################
+.idea/
+*.iml
+*.iws
+out/
+
+########################
+# OS-specific
+########################
+# macOS
+.DS_Store
+.AppleDouble
+.Icon?
+__MACOSX/
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+########################
+# Others (optional)
+########################
+# Gradle
+.gradle/
+build/
+
+# Maven
+target/
+
+# Logs
+*.log
