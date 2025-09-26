@@ -1,8 +1,7 @@
 /* Copyright material for students working on assignments and projects */
 package common;
 
-import java.awt.BorderLayout;
-import java.awt.GraphicsConfiguration;
+import java.awt.*;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -112,6 +111,33 @@ public class CommonsLJ extends JPanel {
 		sceneBG.addChild(sceneTG);
 		
 		return sceneBG;
+	}
+
+	/* a function to create and return a points on a circle */
+	public static Point3f[] circle_Points(float z, float r, int n) {
+		float x, y;
+		Point3f c_pts[] = new Point3f[n];                  // declare 'n' number of points
+
+		for (int i = 0; i < n; i++) {                      // calculate x and y
+			x = (float) Math.cos(Math.PI / 180 * (360.0 * i / n)) * r;
+			y = (float) Math.sin(Math.PI / 180 * (360.0 * i / n)) * r;
+			c_pts[i] = new Point3f(x, y, z);               // set points on the circle
+		}
+
+		return c_pts;
+	}
+
+	/* a function to build the menu bar of the demo */
+	public static MenuBar build_MenuBar(Menu m, String s) {
+		MenuBar menuBar = new MenuBar();
+
+		m.add("Exit");		                               // specify menu items
+		m.add("Pause/Rotate");
+		m.addSeparator();                                  // group of geometry arrays
+		m.add(s);
+		menuBar.add(m);                                    // add items to the menu
+
+		return menuBar;
 	}
 
 	/* a constructor to set up for the application */

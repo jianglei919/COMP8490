@@ -5,12 +5,6 @@ import org.jogamp.java3d.*;
 import org.jogamp.vecmath.Color3f;
 import org.jogamp.vecmath.Point3f;
 
-/**
- * 使用 LineStripArray 近似绘制圆周：
- * - 默认 60 段闭合折线
- * - 半径由构造参数指定
- * - 颜色可通过构造参数（ColoringAttributes）或外部 setAppearance 控制
- */
 public class L2CircleLJ extends Shape3D {
     public L2CircleLJ(float radius, Color3f color) {
         int segments = 60; // 题目要求 60 段

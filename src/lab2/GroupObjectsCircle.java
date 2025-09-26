@@ -1,8 +1,5 @@
-package common;
+package lab2;
 
-
-import lab2.CodeLab2CircleLJ;
-import lab2.L2CircleLJ;
 import org.jogamp.java3d.*;
 import org.jogamp.java3d.utils.behaviors.vp.OrbitBehavior;
 import org.jogamp.java3d.utils.universe.SimpleUniverse;
@@ -15,12 +12,7 @@ import org.jogamp.vecmath.Vector3f;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * 构建场景图：包含一个大圆(0.6, 白色)与一个可选显示的小圆(0.5, 自选颜色)。
- * 使用 RotationInterpolator 实现整体旋转；用 Switch 在 1 圆 / 2 圆 间切换。
- * 注：若你的原始工程中引用了 L2StarXY，请将其替换为 L2CircleXY 并按本类逻辑使用。
- */
-public class GroupObjects2 extends JPanel {
+public class GroupObjectsCircle extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private Canvas3D canvas;
@@ -33,7 +25,7 @@ public class GroupObjects2 extends JPanel {
     // 切换小圆显示
     private Switch smallCircleSwitch;             // child 0: 小圆；通过 setWhichChild 控制显示/隐藏
 
-    public GroupObjects2() {
+    public GroupObjectsCircle() {
         setLayout(new BorderLayout());
 
         // 创建 Canvas3D
@@ -56,7 +48,7 @@ public class GroupObjects2 extends JPanel {
 
         // 交互（鼠标轨道）可选：
         OrbitBehavior orbit = new OrbitBehavior(canvas);
-        orbit.setSchedulingBounds(new BoundingSphere(new Point3d(0,0,0), 100));
+        orbit.setSchedulingBounds(new BoundingSphere(new Point3d(0, 0, 0), 100));
         vp.setViewPlatformBehavior(orbit);
 
         // 挂载场景
@@ -109,20 +101,24 @@ public class GroupObjects2 extends JPanel {
 
         // 光照（线框圆对光照不敏感，此处仅留作模板）
         AmbientLight light = new AmbientLight(true, new Color3f(1f, 1f, 1f));
-        light.setInfluencingBounds(new BoundingSphere(new Point3d(0,0,0), 100));
+        light.setInfluencingBounds(new BoundingSphere(new Point3d(0, 0, 0), 100));
         root.addChild(light);
 
         return root;
     }
 
-    /** 暂停/恢复旋转 */
+    /**
+     * 暂停/恢复旋转
+     */
     public void setPaused(boolean paused) {
         if (rotator != null) {
             rotator.setEnable(!paused);
         }
     }
 
-    /** 切换是否显示小圆 */
+    /**
+     * 切换是否显示小圆
+     */
     public void setShowSmallCircle(boolean show) {
         if (smallCircleSwitch != null) {
             if (show) {
@@ -133,7 +129,9 @@ public class GroupObjects2 extends JPanel {
         }
     }
 
-    /** 获取当前显示的圆数量（用于更新标题） */
+    /**
+     * 获取当前显示的圆数量（用于更新标题）
+     */
     public int getCircleCount() {
         boolean show = CodeLab2CircleLJ.SHOW_SMALL_CIRCLE;
         return show ? 2 : 1;

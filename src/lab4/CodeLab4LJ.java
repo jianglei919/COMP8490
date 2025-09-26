@@ -22,7 +22,6 @@ import org.jogamp.vecmath.Point3d;
 import org.jogamp.vecmath.Vector3f;
 
 import common.CommonsLJ;
-import lab2.CodeLab2LJ;
 
 public class CodeLab4LJ extends JPanel implements ActionListener {
 
@@ -83,7 +82,7 @@ public class CodeLab4LJ extends JPanel implements ActionListener {
 
 		Menu m = new Menu("Menu"); // set menu's label
 		m.addActionListener(this);
-		MenuBar menuBar = CodeLab2LJ.build_MenuBar(m, OBJECT_NAME);
+		MenuBar menuBar = CommonsLJ.build_MenuBar(m, OBJECT_NAME);
 		frame.setMenuBar(menuBar); // build and set the menu bar
 
 		setLayout(new BorderLayout());

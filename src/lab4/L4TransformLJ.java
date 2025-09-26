@@ -2,6 +2,8 @@
  * for students working on assignments and projects */
 package lab4;
 
+import common.CommonsLJ;
+import common.GroupObjects;
 import org.jogamp.java3d.Appearance;
 import org.jogamp.java3d.PolygonAttributes;
 import org.jogamp.java3d.Shape3D;
@@ -9,10 +11,6 @@ import org.jogamp.java3d.TriangleStripArray;
 import org.jogamp.vecmath.Color3f;
 import org.jogamp.vecmath.Point3f;
 import org.jogamp.vecmath.Vector3f;
-
-import common.CommonsLJ;
-import common.GroupObjects;
-import lab2.L2StarLJ;
 
 public class L4TransformLJ extends GroupObjects {
 
@@ -30,7 +28,7 @@ public class L4TransformLJ extends GroupObjects {
         double nt;                                         // declare variables for the calculation of normal
         float x0, y0;
         // prepare points on the circle
-        Point3f c_pts[] = L2StarLJ.circle_Points(0, r, MAX_PTS);
+        Point3f c_pts[] = CommonsLJ.circle_Points(0, r, MAX_PTS);
         Point3f ctr_pt = new Point3f(0f, 0f, 0.1f);
         Point3f p1, p2;
 
