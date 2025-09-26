@@ -52,7 +52,7 @@ public class CodeLab4LJ extends JPanel implements ActionListener {
 		// 第一个平面
 		capTG1 = new TransformGroup(); // make the (top) flat surface translatable
 		capTG1.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-		capTG1.addChild(L4TransformLJ.ring_Side(0, side_color[0]));
+		capTG1.addChild(L4TransformLJ.ring_Side(-1, side_color[0]));
 		sceneTG.addChild(capTG1);
 
 		// 第二个平面（补上缺失的，颜色不同）
