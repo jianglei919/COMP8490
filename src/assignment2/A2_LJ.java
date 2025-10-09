@@ -22,17 +22,12 @@ public class A2_LJ extends JPanel {
 
 		// ===== base square + wind turbine parts + label =====
 		BaseShapes_LJ[] parts = new BaseShapes_LJ[] {
-				new SquareShape(),                  // new multi-colored, half-transparent base (stationary)
-				new TowerShape(),                   // tower (cylinder)
-				new YawShape(),                     // yaw (sphere) -- self-rotation around Y (CCW, 20s/round)
-				new NacelleShape(),                 // nacelle (box)
-				new RotorSphereShape(),             // rotor hub (sphere) 红球
-				new BladeShape(),                   // one magenta blade 粉色旋转叶轮
-//				new BladeRotationShape(),
-				new ColorString("LJ's A2",          // side label
-						CommonsLJ.White,
-						0.1,
-						null)
+				new SquareShape(),                     // 多色半透明基座（静止）
+				new TowerShape(),                      // 塔
+				new YawShapeA2("src/images/ImageTop.jpg"),         // 绕Y逆时针 20s/圈 + 贴图
+				new NacelleShape(),                    // 机舱
+				new RotorAssemblyA2("src/images/ImageTop.jpg"),  // 球+叶片一起绕Z顺时针 5s/圈 + 贴图
+				new ColorString("LJ's A2", CommonsLJ.White, 0.1, null)
 		};
 
 		for (BaseShapes_LJ p : parts) objTG.addChild(p.position_Object());
