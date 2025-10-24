@@ -166,7 +166,7 @@ public class CodeLab7LJ extends JPanel implements ActionListener {
                         if (alpha.length > 1 && alpha[1] != null) {
                             alpha[1].pause();
                         }
-                        frame.setTitle(frame_name + ": Stopped Back");
+                        frame.setTitle(frame_name + ": Stopped Bottom");
                         break;
                     case 2:
                         alpha[0].resume();
@@ -176,7 +176,7 @@ public class CodeLab7LJ extends JPanel implements ActionListener {
                         if (alpha.length > 1 && alpha[1] != null) {
                             alpha[1].resume();
                         }
-                        frame.setTitle(frame_name + ": Resume Back");
+                        frame.setTitle(frame_name + ": Resume Bottom");
                         break;
                     default:
                         break;
