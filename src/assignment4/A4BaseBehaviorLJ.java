@@ -140,12 +140,10 @@ class HeadYawBehavior extends Behavior {
 }
 
 class FanKeyBehavior extends Behavior {
-    private final BladeSpinBehavior spin;
-    private final HeadYawBehavior yaw;
+    private final SwitchPanelController controller;
 
-    public FanKeyBehavior(BladeSpinBehavior spin, HeadYawBehavior yaw) {
-        this.spin = spin;
-        this.yaw = yaw;
+    public FanKeyBehavior(SwitchPanelController controller) {
+        this.controller = controller;
     }
 
     @Override
@@ -163,11 +161,9 @@ class FanKeyBehavior extends Behavior {
                     if (e instanceof java.awt.event.KeyEvent ke) {
                         int code = ke.getKeyCode();
                         if (code == java.awt.event.KeyEvent.VK_Z) {
-                            yaw.togglePause();
+                            controller.toggleLeft();   // 左键：暂停键 红/绿切换
                         } else if (code == java.awt.event.KeyEvent.VK_X) {
-                            boolean newPower = !(yaw.isPowerOn() && spin.isPowerOn());
-                            yaw.setPower(newPower);
-                            spin.setPower(newPower);
+                            controller.toggleRight();  // 右键：电源键 红/绿切换
                         }
                     }
                 }

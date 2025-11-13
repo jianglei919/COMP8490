@@ -1,10 +1,8 @@
 package assignment4;
 
-import org.jogamp.java3d.BranchGroup;
-import org.jogamp.java3d.Canvas3D;
-import org.jogamp.java3d.Transform3D;
-import org.jogamp.java3d.TransformGroup;
+import org.jogamp.java3d.*;
 import org.jogamp.java3d.utils.universe.SimpleUniverse;
+import org.jogamp.java3d.utils.geometry.Box;
 import org.jogamp.vecmath.Color3f;
 import org.jogamp.vecmath.Point3d;
 import org.jogamp.vecmath.Vector3d;
@@ -17,17 +15,23 @@ public class A4_LJ extends JPanel {
     private static final long serialVersionUID = 1L;
     private static JFrame frame;
 
-    private static final double SCALE_SHAFT = 0.18; // 立柱
-    private static final double SCALE_MOTOR = 0.60; // 电机外壳
-    private static final double SCALE_BLADE = 1.45; // 叶片组
-    private static final double SCALE_GUARD = 1.5; // 护罩线框
+    private static final double SCALE_SHAFT = 0.18;
+    private static final double SCALE_MOTOR = 0.60;
+    private static final double SCALE_BLADE = 1.45;
+    private static final double SCALE_GUARD = 1.5;
 
-    private static final Vector3f YAW_PIVOT_POS = new Vector3f(0.0f, 0.65f, 0f); // 摇头枢轴（在立柱顶）
+    private static final Vector3f YAW_PIVOT_POS = new Vector3f(0.0f, 0.65f, 0f);
     private static final float HUB_RADIUS = 0.1f;
     private static final float HUB_LENGTH = 0.65f;
 
     private static BladeSpinBehavior spinBeh;
-    private static HeadYawBehavior yawBeh;
+    private static HeadYawBehavior  yawBeh;
+
+    // 用于鼠标拾取与变色
+    static Shape3D[] LEFT_BTN_PARTS;
+    static Shape3D[] RIGHT_BTN_PARTS;
+
+    static SwitchPanelController CONTROLLER;
 
     public A4_LJ(BranchGroup sceneBG) {
         GraphicsConfiguration config = SimpleUniverse.getPreferredConfiguration();
@@ -38,6 +42,11 @@ public class A4_LJ extends JPanel {
         sceneBG.compile();
         su.addBranchGraph(sceneBG);
 
+        // 安装鼠标拾取
+        if (CONTROLLER != null) {
+            CanvasMousePicker.install(canvas, sceneBG, CONTROLLER);
+        }
+
         setLayout(new BorderLayout());
         add("Center", canvas);
         frame.setSize(800, 800);
@@ -45,16 +54,12 @@ public class A4_LJ extends JPanel {
         frame.setVisible(true);
     }
 
-    /**
-     * 创建风扇底座（带纹理的平板）并在底座前侧放上一行文字
-     */
+    /** 底座 + 文字 */
     public static TransformGroup create_Base(String str) {
         BaseShapeA baseShape = new BaseShapeA();
-
         Transform3D scale = new Transform3D();
         scale.setScale(new Vector3d(4d, 2d, 4d));
         TransformGroup baseTG = new TransformGroup(scale);
-
         baseTG.addChild(baseShape.position_Object());
 
         ColorString clr_str = new ColorString(str, CommonsLJ.Red, 0.05f,
@@ -65,32 +70,73 @@ public class A4_LJ extends JPanel {
         return baseTG;
     }
 
-    /**
-     * 组装整台风扇
-     */
+    /** 组装整台风扇 */
     private static TransformGroup create_Fan() {
         // 1) 支架
         StandObjectA stand = new StandObjectA();
         TransformGroup fanRoot = stand.position_Object();
 
-        // 2) 开关
-        stand.add_Child(new SwitchObjectA().position_Object());
+        // 2) 开关盒
+        SwitchObjectA sw = new SwitchObjectA();
+        TransformGroup switchTG = sw.position_Object();
+        stand.add_Child(switchTG);
+
+        // === 左/右按钮：使用 Box，并对 6 个面分别设置可拾取与可改外观 ===
+        // 左按钮
+        Transform3D leftT = new Transform3D();
+        leftT.setTranslation(new Vector3f(0.675f, 0.00f, -0.05f));
+        TransformGroup leftTG = new TransformGroup(leftT);
+
+        Appearance redApp = CommonsLJ.obj_Appearance(CommonsLJ.Red);
+        Box leftBox = new Box(0.325f, 0.305f, 0.315f,
+                Box.GENERATE_NORMALS, redApp);
+
+        int[] faces = {Box.FRONT, Box.BACK, Box.LEFT, Box.RIGHT, Box.TOP, Box.BOTTOM};
+        LEFT_BTN_PARTS = new Shape3D[faces.length];
+        for (int i = 0; i < faces.length; i++) {
+            Shape3D s = leftBox.getShape(faces[i]);
+            LEFT_BTN_PARTS[i] = s;
+            s.setPickable(true);
+            s.setCapability(Shape3D.ALLOW_APPEARANCE_WRITE);
+            s.setName(SwitchPanelController.LEFT_NAME);
+        }
+        leftTG.addChild(leftBox);
+        switchTG.addChild(leftTG);
+
+        // 右按钮
+        Transform3D rightT = new Transform3D();
+        rightT.setTranslation(new Vector3f(-0.675f, 0.0f, -0.05f));
+        TransformGroup rightTG = new TransformGroup(rightT);
+
+        Box rightBox = new Box(0.325f, 0.305f, 0.315f,
+                Box.GENERATE_NORMALS, CommonsLJ.obj_Appearance(CommonsLJ.Red));
+
+        RIGHT_BTN_PARTS = new Shape3D[faces.length];
+        for (int i = 0; i < faces.length; i++) {
+            Shape3D s = rightBox.getShape(faces[i]);
+            RIGHT_BTN_PARTS[i] = s;
+            s.setPickable(true);
+            s.setCapability(Shape3D.ALLOW_APPEARANCE_WRITE);
+            s.setName(SwitchPanelController.RIGHT_NAME);
+        }
+        rightTG.addChild(rightBox);
+        switchTG.addChild(rightTG);
 
         // 3) 底座 + 标识
-        fanRoot.addChild(create_Base("LJ's A3"));
+        fanRoot.addChild(create_Base("LJ's A4"));
 
-        // 4) 摇头枢轴（挂一切需要左右摆动的部件）
+        // 4) 摇头枢轴
         Transform3D yawTrans = new Transform3D();
         yawTrans.setTranslation(new Vector3f(YAW_PIVOT_POS));
         TransformGroup yawPivot = new TransformGroup(yawTrans);
-        yawPivot.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE); // 行为会改写它
+        yawPivot.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
         stand.add_Child(yawPivot);
 
-        // 5) 立柱（随摆头）
+        // 5) 立柱
         ShaftObjectLJ shaft = new ShaftObjectLJ(SCALE_SHAFT, new Vector3f(0, -0.35f, 0));
         yawPivot.addChild(shaft.position_Object());
 
-        // 6) 扇头整体挂点（把机头/护网/叶片整体推到前方/上方）
+        // 6) 扇头整体挂点
         Transform3D headT = new Transform3D();
         headT.setTranslation(new Vector3f(0.0f, 0.65f, -0.5f));
         TransformGroup headMount = new TransformGroup(headT);
@@ -111,12 +157,12 @@ public class A4_LJ extends JPanel {
         headMount.addChild(guardMount);
         guardMount.addChild(guard.position_Object());
 
-        // 8) 叶片旋转枢轴（仅旋转，不要给它平移；旋转行为会每帧写它）
+        // 8) 叶片旋转枢轴
         TransformGroup spinPivot = new TransformGroup();
         spinPivot.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
         headMount.addChild(spinPivot);
 
-        // 9) 叶片整体微调（在旋转枢轴下做前后/高度微调）
+        // 9) 叶片整体微调
         Transform3D rotorShiftT = new Transform3D();
         rotorShiftT.setTranslation(new Vector3f(0f, 0f, 0.2f));
         TransformGroup rotorMount = new TransformGroup(rotorShiftT);
@@ -127,22 +173,30 @@ public class A4_LJ extends JPanel {
         BladeObjectLJ blade = new BladeObjectLJ(SCALE_BLADE);
         rotorMount.addChild(blade.position_Object());
 
-        // 12) 行为：叶片旋转 + 摇头 + 键盘
+        // 12) 行为
         spinBeh = new BladeSpinBehavior(spinPivot, (float) (2 * Math.PI / 0.5)); // 0.5s/圈
-        spinBeh.setPower(true);
+        yawBeh  = new HeadYawBehavior(yawPivot, YAW_PIVOT_POS, 5000, 2500, 200);
 
-        // 使用基准位传入，避免读取 transform 的不确定性；平滑往返并在端点停顿
-        yawBeh = new HeadYawBehavior(yawPivot, YAW_PIVOT_POS, 5000, 2500, 200);
-        yawBeh.setPause(false);
+        // 声音 + 控制器
+        SoundUtilityJOAL sound = new SoundUtilityJOAL();
+        sound.load("cow", 0f, 0f, 0f, false);
+        sound.load("ocean", 0f, 0f, 0f, true);
 
-        FanKeyBehavior keyBeh = new FanKeyBehavior(spinBeh, yawBeh);
+        CONTROLLER = new SwitchPanelController(
+                LEFT_BTN_PARTS, RIGHT_BTN_PARTS,
+                spinBeh, yawBeh, sound
+        );
+        // 初始：右=电源ON（红）；左=暂停ON（红）
+        CONTROLLER.setRightOn(true);
+        CONTROLLER.setLeftOn(true);
+        CONTROLLER.applyAll();
 
-        // 13) 调度范围
+        FanKeyBehavior keyBeh = new FanKeyBehavior(CONTROLLER);
+
         spinBeh.setSchedulingBounds(CommonsLJ.hundredBS);
         yawBeh.setSchedulingBounds(CommonsLJ.hundredBS);
         keyBeh.setSchedulingBounds(CommonsLJ.hundredBS);
 
-        // 14) 挂到场景图
         fanRoot.addChild(spinBeh);
         fanRoot.addChild(yawBeh);
         fanRoot.addChild(keyBeh);
@@ -150,16 +204,11 @@ public class A4_LJ extends JPanel {
         return fanRoot;
     }
 
-    /**
-     * 场景根节点
-     */
+    /** 场景根节点 */
     public static BranchGroup create_Scene() {
         BranchGroup sceneBG = new BranchGroup();
         TransformGroup sceneTG = new TransformGroup();
-
-        // 整体旋转（可注释以便调参）
 //        sceneTG.addChild(CommonsLJ.rotate_Behavior(7500, sceneTG));
-
         sceneTG.addChild(create_Fan());
         sceneBG.addChild(sceneTG);
         sceneBG.addChild(CommonsLJ.add_Lights(CommonsLJ.White, 1));
@@ -168,7 +217,7 @@ public class A4_LJ extends JPanel {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            frame = new JFrame("LJ's Assignment 3");
+            frame = new JFrame("LJ's Assignment 4");
             frame.getContentPane().add(new A4_LJ(create_Scene()));
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         });
